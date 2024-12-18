@@ -1,0 +1,6 @@
+{
+	'help': (lambda:[
+		out.append('    ip          : prints your network ip'),
+		out.append('    lookup [ip] : prints ip information')
+	])
+}
