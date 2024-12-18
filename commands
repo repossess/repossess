@@ -1,6 +1,43 @@
 {
-	'help': (lambda:[
-		out.append('    ip          : prints your network ip'),
-		out.append('    lookup [ip] : prints ip information')
-	])
+    'help': (lambda: (
+        out.append(f'[~] : help'),
+        out.append('    =           : scrolls up'),
+        out.append('    -           : scrolls down'),
+        out.append(''),
+        out.append('    ip          : shows your network ip'),
+        out.append('    ping [ip]   : pings ip'),
+        out.append('    lookup [ip] : shows ip information'),
+    )),
+
+    'ip': (lambda: (
+        out.append(f'[~] : ip'),
+        ip := __import__('requests').get('https://api.ipify.org').text,
+        out.append('    ' + ip)
+    )),
+
+    'lookup': (lambda ip: (
+        out.append(f'[~] : lookup'),
+        ip_information := __import__('requests').get(f'https://extreme-ip-lookup.com/json/{ip}?key=Qn97RtiI2gwjStzJJjuG').json(),
+        out.append('    continent : ' + ip_information['continent']),
+        out.append('    country   : ' + ip_information['country'] + ' (' + ip_information['countryCode'] + ')'),
+        out.append('    region    : ' + ip_information['city'] + ', ' + ip_information['region']),
+
+        out.append(''),
+        out.append('    asn       : ' + ip_information['asnOrg']),
+        out.append('                ' + ip_information['asnName'] + ' (' + ip_information['asn'] + ')'),
+    )),
+
+    'ping': (lambda ip: (
+        out.append(f'[~] : ping'),
+        ping_information := __import__('subprocess').check_output(f'ping {ip}').decode('utf-8').split('\r\n')[1:-1],
+        [out.append(_) for _ in ping_information]
+    )),
+
+    '-': (lambda : (
+        globals().__setitem__('offset', offset-1)
+    )),
+
+    '=': (lambda : (
+        globals().__setitem__('offset', offset+1)
+    )),
 }
