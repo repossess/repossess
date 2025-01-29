@@ -11,7 +11,7 @@ curl -o fleur.py https://raw.githubusercontent.com/repossess/fleur/main/loader.p
 # showcase
 ![cmd](https://github.com/repossess/fleur/blob/main/dependencies/cmd.png?raw=true)
 
-# ______________________________
+#
 
 # pybear
 A discrete, custom python bytecode virtual machine. Finally let's you obfuscate and password lock programs with ease.
